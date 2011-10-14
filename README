@@ -20,3 +20,12 @@ Basic comunication with devices usign SCPI as HP 34970A multimeter and others.
 This is just collection of hacks to allow basic operation without much effort,
 goot point to start hacking this device and then probably go away.
 
+===== Usage =====
+
+This easiest way to incorporate this code into your project is add it as git
+submodule.
+
+ * cd into dir where you software id checked out
+ * type:
+   git submodule add git@github.com:pinkavaj/QSCPIDev.git
+
