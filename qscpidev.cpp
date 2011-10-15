@@ -9,25 +9,25 @@
 
 #include "../QSCPIDev/qscpidev.h"
 
-ScpiDev::Sense_t ScpiDev::SenseVolt = "CONF:VOLT";
-ScpiDev::Sense_t ScpiDev::SenseRes = "CONF:RES";
+QSCPIDev::Sense_t QSCPIDev::SenseVolt = "CONF:VOLT";
+QSCPIDev::Sense_t QSCPIDev::SenseRes = "CONF:RES";
 
-ScpiDev::ScpiDev() :
+QSCPIDev::QSCPIDev() :
     QSerial(), errorno(0), errorstr("")
 {
 }
 
-ScpiDev::~ScpiDev()
+QSCPIDev::~QSCPIDev()
 {
     close();
 }
 
-void ScpiDev::close()
+void QSCPIDev::close()
 {
     QSerial::close();
 }
 
-bool ScpiDev::current(double *i)
+bool QSCPIDev::current(double *i)
 {
     QString resp;
     if (!sendQuery(&resp, "SOUR:CURR?"))
@@ -39,19 +39,19 @@ bool ScpiDev::current(double *i)
     return ok;
 }
 
-int ScpiDev::error() const
+int QSCPIDev::error() const
 {
     return errorno;
 }
 
-QString ScpiDev::errorStr() const
+QString QSCPIDev::errorStr() const
 {
     if (errorno == ERR_QSERIAL)
         return QSerial::errorStr();
     return errorstr;
 }
 
-QString ScpiDev::formatCmd(const QString &cmd, const Channels_t &channels)
+QString QSCPIDev::formatCmd(const QString &cmd, const Channels_t &channels)
 {
     if (!channels.size()) {
         return cmd;
@@ -67,12 +67,12 @@ QString ScpiDev::formatCmd(const QString &cmd, const Channels_t &channels)
     return format.arg(cmd).arg(ch.join(","));
 }
 
-bool ScpiDev::init()
+bool QSCPIDev::init()
 {
     return sendCmd("INIT", 2000000);
 }
 
-bool ScpiDev::open(const QString &port, BaudeRate_t baudeRate)
+bool QSCPIDev::open(const QString &port, BaudeRate_t baudeRate)
 {
     const long timeout = (10l * 1000000l) / 9600l;
 
@@ -94,7 +94,7 @@ bool ScpiDev::open(const QString &port, BaudeRate_t baudeRate)
     return true;
 }
 
-bool ScpiDev::output(bool *enabled)
+bool QSCPIDev::output(bool *enabled)
 {
     QString resp;
 
@@ -115,7 +115,7 @@ bool ScpiDev::output(bool *enabled)
     return false;
 }
 
-bool ScpiDev::read(QStringList *values)
+bool QSCPIDev::read(QStringList *values)
 {
     QString s;
 
@@ -131,7 +131,7 @@ bool ScpiDev::read(QStringList *values)
     return true;
 }
 
-bool ScpiDev::recvResponse(QString *resp, long timeout)
+bool QSCPIDev::recvResponse(QString *resp, long timeout)
 {
     errorno = ERR_OK;
     errorstr = "";
@@ -155,7 +155,7 @@ bool ScpiDev::recvResponse(QString *resp, long timeout)
     return false;
 }
 
-bool ScpiDev::sendCmd(const QString &cmd, long timeout)
+bool QSCPIDev::sendCmd(const QString &cmd, long timeout)
 {
     QString resp;
 
@@ -172,7 +172,7 @@ bool ScpiDev::sendCmd(const QString &cmd, long timeout)
     return true;
 }
 
-bool ScpiDev::sendCmd(const QString &cmd, const Channels_t &channels, long timeout)
+bool QSCPIDev::sendCmd(const QString &cmd, const Channels_t &channels, long timeout)
 {
     QString resp;
 
@@ -189,7 +189,7 @@ bool ScpiDev::sendCmd(const QString &cmd, const Channels_t &channels, long timeo
     return true;
 }
 
-bool ScpiDev::sendQuery(QString *resp, const QString &cmd, long timeout)
+bool QSCPIDev::sendQuery(QString *resp, const QString &cmd, long timeout)
 {
     errorno = 0;
     errorstr = "";
@@ -206,21 +206,21 @@ bool ScpiDev::sendQuery(QString *resp, const QString &cmd, long timeout)
     return true;
 }
 
-bool ScpiDev::sendQuery(QString *resp, const QString &cmd, const Channels_t &channels, long timeout)
+bool QSCPIDev::sendQuery(QString *resp, const QString &cmd, const Channels_t &channels, long timeout)
 {
     QString _cmd(formatCmd(cmd, channels));
 
     return sendQuery(resp, _cmd, timeout);
 }
 
-bool ScpiDev::setCurrent(double current)
+bool QSCPIDev::setCurrent(double current)
 {
     QString cmd("SOUR:CURR %1");
 
     return sendCmd(cmd.arg(current));
 }
 
-bool ScpiDev::setOutput(bool enabled)
+bool QSCPIDev::setOutput(bool enabled)
 {
     if (enabled)
         return sendCmd("OUTP 1");
@@ -228,7 +228,7 @@ bool ScpiDev::setOutput(bool enabled)
         return sendCmd("OUTP 0");
 }
 
-bool ScpiDev::setRoute(Channels_t closeChannels)
+bool QSCPIDev::setRoute(Channels_t closeChannels)
 {
     Channels_t openChannels(routeChannelsClosed);
     Channels_t closedChannels(closeChannels);
@@ -257,14 +257,14 @@ bool ScpiDev::setRoute(Channels_t closeChannels)
     return true;
 }
 
-bool ScpiDev::setScan(Channel_t channel)
+bool QSCPIDev::setScan(Channel_t channel)
 {
     QString cmd("ROUT:SCAN (@%1);:INIT");
 
     return sendCmd(cmd.arg(channel), 2000000);
 }
 
-bool ScpiDev::setScan(Channels_t channels)
+bool QSCPIDev::setScan(Channels_t channels)
 {
     QString cmd("ROUT:SCAN");
 
@@ -272,7 +272,7 @@ bool ScpiDev::setScan(Channels_t channels)
     return sendCmd(cmd, 2000000);
 }
 
-bool ScpiDev::setSense(Sense_t sense, Channels_t channels)
+bool QSCPIDev::setSense(Sense_t sense, Channels_t channels)
 {
     return sendCmd(sense, channels);
 }

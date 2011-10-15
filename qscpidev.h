@@ -5,7 +5,7 @@
 #include <qlist.h>
 #include <qstringlist.h>
 
-class ScpiDev : protected QSerial
+class QSCPIDev : protected QSerial
 {
 public:
     typedef const char *Sense_t;
@@ -22,8 +22,8 @@ public:
     static Sense_t SenseVolt;
     static Sense_t SenseRes;
 
-    ScpiDev();
-    ~ScpiDev();
+    QSCPIDev();
+    ~QSCPIDev();
     void close();
     bool current(double *i);
     int error() const;
