@@ -11,6 +11,7 @@
 
 QSCPIDev::Sense_t QSCPIDev::SenseVolt = "CONF:VOLT";
 QSCPIDev::Sense_t QSCPIDev::SenseRes = "CONF:RES";
+QSCPIDev::Sense_t QSCPIDev::SenseTemp = "CONF:TEMP TC,K,";
 
 QSCPIDev::QSCPIDev() :
     QSerial(), errorno(0), errorstr("")

@@ -21,6 +21,7 @@ public:
 
     static Sense_t SenseVolt;
     static Sense_t SenseRes;
+    static Sense_t SenseTemp;
 
     QSCPIDev();
     ~QSCPIDev();
