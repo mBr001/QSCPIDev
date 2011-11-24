@@ -32,7 +32,7 @@ public:
     bool init();
     bool open(const QString &port, BaudeRate_t baudeRate = QSerial::Baude9600);
     bool output(bool *enabled);
-    bool read(QStringList *values);
+    bool read(QStringList *values, long timeout_usec = 0);
     bool setCurrent(double current);
     bool setOutput(bool enabled);
     bool setRoute(Channels_t closeChannels);
@@ -42,11 +42,11 @@ public:
 
 protected:
     QString formatCmd(const QString &cmd, const Channels_t &channels);
-    bool recvResponse(QString *resp, long timeout = 0);
-    bool sendCmd(const QString &cmd, long timeout = 0);
-    bool sendCmd(const QString &cmd, const Channels_t &channels, long timeout = 0);
-    bool sendQuery(QString *resp, const QString &cmd, long timeout = 0);
-    bool sendQuery(QString *resp, const QString &cmd, const Channels_t &channels, long timeout = 0);
+    bool recvResponse(QString *resp, long timeout_usec = 0);
+    bool sendCmd(const QString &cmd, long timeout_usec = 0);
+    bool sendCmd(const QString &cmd, const Channels_t &channels, long timeout_usec = 0);
+    bool sendQuery(QString *resp, const QString &cmd, long timeout_usec = 0);
+    bool sendQuery(QString *resp, const QString &cmd, const Channels_t &channels, long timeout_usec = 0);
 
 private:
     int errorno;
