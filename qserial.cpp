@@ -27,10 +27,8 @@ void QSerial::close()
     errorno = 0;
     errorstr = "";
 
-    if (isOpen()) {
-        ::close(fd);
-        fd = -1;
-    }
+    ::close(fd);
+    fd = -1;
 }
 
 int QSerial::error() const
@@ -82,8 +80,6 @@ QStringList QSerial::list()
 bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout,
                    long timeoutPerChar)
 {
-    struct termios tio;
-
     errorno = 0;
     errorstr = "";
 
@@ -94,6 +90,7 @@ bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout,
         return false;
     }
 
+    struct termios tio;
     memset(&tio, 0, sizeof(tio));
     tio.c_cflag = CS8 | CREAD | CLOCAL;
     tio.c_cc[VMIN] = 1;
