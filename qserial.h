@@ -56,7 +56,7 @@ public:
     bool write(const QString &str);
 
     bool readLine(QString *str, ssize_t count);
-    bool readLine(QString *str, ssize_t maxSize, long timeout);
+    bool readLine(QString *str, ssize_t maxSize, long timeout_usec);
 
 private:
     int errorno;
@@ -65,7 +65,7 @@ private:
     long timeoutOffs, timeoutPerChar;
 
     bool isLine(const char *buf, ssize_t size) const;
-    ssize_t readLine(char *buf, ssize_t count, long timeout);
+    ssize_t readLine(char *buf, ssize_t count, long timeout_usec);
 };
 
 #endif // QSERIAL_H

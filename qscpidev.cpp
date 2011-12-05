@@ -11,6 +11,7 @@
 
 QSCPIDev::Sense_t QSCPIDev::SenseVolt = "CONF:VOLT";
 QSCPIDev::Sense_t QSCPIDev::SenseRes = "CONF:RES";
+QSCPIDev::Sense_t QSCPIDev::SenseTemp = "CONF:TEMP TC,K,";
 
 QSCPIDev::QSCPIDev() :
     QSerial(), errorno(0), errorstr("")
@@ -74,11 +75,11 @@ bool QSCPIDev::init()
 
 bool QSCPIDev::open(const QString &port, BaudeRate_t baudeRate)
 {
-    const long timeout = (10l * 1000000l) / 9600l;
+    const long timeout_usec = (10l * 1000000l) / 9600l;
 
     close();
 
-    if (!QSerial::open(port, baudeRate, 300000, timeout))
+    if (!QSerial::open(port, baudeRate, 300000, timeout_usec))
         return false;
 
     if (!write("\n")) {
@@ -115,11 +116,11 @@ bool QSCPIDev::output(bool *enabled)
     return false;
 }
 
-bool QSCPIDev::read(QStringList *values)
+bool QSCPIDev::read(QStringList *values, long timeout_usec)
 {
     QString s;
 
-    if (!sendQuery(&s, "READ?"))
+    if (!sendQuery(&s, "READ?", timeout_usec))
         return false;
 
     *values = s.split(",", QString::SkipEmptyParts);
@@ -131,12 +132,12 @@ bool QSCPIDev::read(QStringList *values)
     return true;
 }
 
-bool QSCPIDev::recvResponse(QString *resp, long timeout)
+bool QSCPIDev::recvResponse(QString *resp, long timeout_usec)
 {
     errorno = ERR_OK;
     errorstr = "";
 
-    if (!readLine(resp, 1024, timeout)) {
+    if (!readLine(resp, 1024, timeout_usec)) {
         errorno = ERR_QSERIAL;
         return false;
     }
@@ -155,11 +156,11 @@ bool QSCPIDev::recvResponse(QString *resp, long timeout)
     return false;
 }
 
-bool QSCPIDev::sendCmd(const QString &cmd, long timeout)
+bool QSCPIDev::sendCmd(const QString &cmd, long timeout_usec)
 {
     QString resp;
 
-    if (!sendQuery(&resp, cmd, timeout))
+    if (!sendQuery(&resp, cmd, timeout_usec))
         return false;
 
     if (!resp.isEmpty()) {
@@ -172,11 +173,11 @@ bool QSCPIDev::sendCmd(const QString &cmd, long timeout)
     return true;
 }
 
-bool QSCPIDev::sendCmd(const QString &cmd, const Channels_t &channels, long timeout)
+bool QSCPIDev::sendCmd(const QString &cmd, const Channels_t &channels, long timeout_usec)
 {
     QString resp;
 
-    if (!sendQuery(&resp, cmd, channels, timeout))
+    if (!sendQuery(&resp, cmd, channels, timeout_usec))
         return false;
 
     if (!resp.isEmpty()) {
@@ -189,7 +190,7 @@ bool QSCPIDev::sendCmd(const QString &cmd, const Channels_t &channels, long time
     return true;
 }
 
-bool QSCPIDev::sendQuery(QString *resp, const QString &cmd, long timeout)
+bool QSCPIDev::sendQuery(QString *resp, const QString &cmd, long timeout_usec)
 {
     errorno = 0;
     errorstr = "";
@@ -200,17 +201,17 @@ bool QSCPIDev::sendQuery(QString *resp, const QString &cmd, long timeout)
         return false;
     }
 
-    if (!recvResponse(resp, timeout))
+    if (!recvResponse(resp, timeout_usec))
         return false;
 
     return true;
 }
 
-bool QSCPIDev::sendQuery(QString *resp, const QString &cmd, const Channels_t &channels, long timeout)
+bool QSCPIDev::sendQuery(QString *resp, const QString &cmd, const Channels_t &channels, long timeout_usec)
 {
     QString _cmd(formatCmd(cmd, channels));
 
-    return sendQuery(resp, _cmd, timeout);
+    return sendQuery(resp, _cmd, timeout_usec);
 }
 
 bool QSCPIDev::setCurrent(double current)

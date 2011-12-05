@@ -77,7 +77,7 @@ QStringList QSerial::list()
     return ports;
 }
 
-bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout,
+bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout_usec,
                    long timeoutPerChar)
 {
     errorno = 0;
@@ -106,7 +106,7 @@ bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout,
         return false;
     }
 
-    this->timeoutOffs = timeout;
+    this->timeoutOffs = timeout_usec;
     this->timeoutPerChar = timeoutPerChar;
     return fd;
 }
@@ -145,7 +145,7 @@ bool QSerial::readLine(QString *str, ssize_t maxSize, long timeout = 0)
  * @return      Number of bytes succesfully readed, or gefative number
  *      (error no.) on error.
  */
-ssize_t QSerial::readLine(char *buf, ssize_t count, long timeout)
+ssize_t QSerial::readLine(char *buf, ssize_t count, long timeout_usec)
 {
     const char *buf_ = buf;
     fd_set readfds;
@@ -153,9 +153,9 @@ ssize_t QSerial::readLine(char *buf, ssize_t count, long timeout)
     ssize_t size = 0;
     struct timeval timeout_s;
 
-    timeout = timeout ? timeout : timeoutOffs;
-    timeout_s.tv_sec = timeout / 1000000l;
-    timeout_s.tv_usec = timeout % 1000000l;
+    timeout_usec = timeout_usec ? timeout_usec : timeoutOffs;
+    timeout_s.tv_sec = timeout_usec / 1000000l;
+    timeout_s.tv_usec = timeout_usec % 1000000l;
 
     FD_ZERO(&readfds);
     FD_SET(fd, &readfds);
