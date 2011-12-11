@@ -45,10 +45,10 @@ int QSCPIDev::error() const
     return errorno;
 }
 
-QString QSCPIDev::errorStr() const
+QString QSCPIDev::errorString() const
 {
     if (errorno == ERR_QSERIAL)
-        return QSerial::errorStr();
+        return QSerial::errorString();
     return errorstr;
 }
 

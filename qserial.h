@@ -20,7 +20,7 @@ public:
     int error() const;
 
     /** String describing last error. */
-    QString errorStr() const;
+    QString errorString() const;
 
     /** @return true if port is open, false otherwise. */
     bool isOpen() const;

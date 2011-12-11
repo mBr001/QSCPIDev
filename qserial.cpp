@@ -36,7 +36,7 @@ int QSerial::error() const
     return errorno;
 }
 
-QString QSerial::errorStr() const
+QString QSerial::errorString() const
 {
     return QString(errorstr) + strerror(errorno);
 }
