@@ -79,10 +79,13 @@ bool QSCPIDev::open(const QString &port, BaudeRate_t baudeRate)
 
     close();
 
-    if (!QSerial::open(port, baudeRate, 300000, timeout_usec))
+    if (!QSerial::open(port, baudeRate, 300000, timeout_usec)) {
+        errorno = ERR_QSERIAL;
         return false;
+    }
 
     if (!write("\n")) {
+        errorno = ERR_QSERIAL;
         QSerial::close();
         return false;
     }
