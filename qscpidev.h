@@ -35,18 +35,20 @@ public:
     bool read(QStringList *values, long timeout_usec = 0);
     bool setCurrent(double current);
     bool setOutput(bool enabled);
-    bool setRoute(Channels_t closeChannels);
+    bool setRoute(const Channels_t &closeChannels);
     bool setScan(Channel_t channel);
-    bool setScan(Channels_t channels);
-    bool setSense(Sense_t sense, Channels_t channels);
+    bool setScan(const Channels_t &channels);
+    bool setSense(Sense_t sense, const Channels_t &channels,
+                  const QStringList &params = QStringList());
 
 protected:
-    QString formatCmd(const QString &cmd, const Channels_t &channels);
+    QString formatCmd(const QString &cmd, const QStringList &params, const Channels_t &channels);
     bool recvResponse(QString *resp, long timeout_usec = 0);
     bool sendCmd(const QString &cmd, long timeout_usec = 0);
     bool sendCmd(const QString &cmd, const Channels_t &channels, long timeout_usec = 0);
+    bool sendCmd(const QString &cmd, const QStringList &params,
+                 const Channels_t &channels, long timeout_usec = 0);
     bool sendQuery(QString *resp, const QString &cmd, long timeout_usec = 0);
-    bool sendQuery(QString *resp, const QString &cmd, const Channels_t &channels, long timeout_usec = 0);
 
 private:
     int errorno;

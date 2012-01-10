@@ -11,7 +11,7 @@
 
 QSCPIDev::Sense_t QSCPIDev::SenseVolt = "CONF:VOLT";
 QSCPIDev::Sense_t QSCPIDev::SenseRes = "CONF:RES";
-QSCPIDev::Sense_t QSCPIDev::SenseTemp = "CONF:TEMP TC,K,";
+QSCPIDev::Sense_t QSCPIDev::SenseTemp = "CONF:TEMP";
 
 QSCPIDev::QSCPIDev() :
     QSerial(), errorno(0), errorstr("")
@@ -52,20 +52,25 @@ QString QSCPIDev::errorString() const
     return errorstr;
 }
 
-QString QSCPIDev::formatCmd(const QString &cmd, const Channels_t &channels)
+QString QSCPIDev::formatCmd(const QString &cmd, const QStringList &params, const Channels_t &channels)
 {
-    if (!channels.size()) {
+    if (params.size() == 0 && channels.size() == 0)
         return cmd;
+
+    QStringList params_(params);
+
+    if (channels.size()) {
+        QStringList ch;
+        foreach(int channel, channels) {
+            ch.append(QVariant(channel).toString());
+        }
+
+        params_.append(QString("(@").append(ch.join(",")).append(")"));
     }
 
-    QStringList ch;
-    foreach(int channel, channels) {
-        ch.append(QVariant(channel).toString());
-    }
+    QString format("%1 %2");
 
-    QString format("%1 (@%2)");
-
-    return format.arg(cmd).arg(ch.join(","));
+    return format.arg(cmd).arg(params_.join(","));
 }
 
 bool QSCPIDev::init()
@@ -178,9 +183,16 @@ bool QSCPIDev::sendCmd(const QString &cmd, long timeout_usec)
 
 bool QSCPIDev::sendCmd(const QString &cmd, const Channels_t &channels, long timeout_usec)
 {
-    QString resp;
+    return sendCmd(cmd, QStringList(), channels, timeout_usec);
+}
 
-    if (!sendQuery(&resp, cmd, channels, timeout_usec))
+bool QSCPIDev::sendCmd(const QString &cmd, const QStringList &params,
+                       const Channels_t &channels, long timeout_usec)
+{
+    QString resp;
+    QString _cmd(formatCmd(cmd, params, channels));
+
+    if (!sendQuery(&resp, _cmd, timeout_usec))
         return false;
 
     if (!resp.isEmpty()) {
@@ -210,13 +222,6 @@ bool QSCPIDev::sendQuery(QString *resp, const QString &cmd, long timeout_usec)
     return true;
 }
 
-bool QSCPIDev::sendQuery(QString *resp, const QString &cmd, const Channels_t &channels, long timeout_usec)
-{
-    QString _cmd(formatCmd(cmd, channels));
-
-    return sendQuery(resp, _cmd, timeout_usec);
-}
-
 bool QSCPIDev::setCurrent(double current)
 {
     QString cmd("SOUR:CURR %1");
@@ -232,31 +237,32 @@ bool QSCPIDev::setOutput(bool enabled)
         return sendCmd("OUTP 0");
 }
 
-bool QSCPIDev::setRoute(Channels_t closeChannels)
+bool QSCPIDev::setRoute(const Channels_t &closeChannels)
 {
-    Channels_t openChannels(routeChannelsClosed);
-    Channels_t closedChannels(closeChannels);
+    Channels_t openCH(routeChannelsClosed);
+    Channels_t closedCH(closeChannels);
+    Channels_t closeCH_(closeChannels);
 
     foreach (Channel_t ch, closeChannels) {
-        openChannels.removeOne(ch);
+        openCH.removeOne(ch);
     }
 
     foreach (Channel_t ch, routeChannelsClosed) {
-        closeChannels.removeOne(ch);
+        closeCH_.removeOne(ch);
     }
 
-    if(!openChannels.isEmpty()) {
-        if (!sendCmd("ROUT:OPEN", openChannels))
+    if(!openCH.isEmpty()) {
+        if (!sendCmd("ROUT:OPEN", openCH))
             return false;
     }
     routeChannelsClosed.clear();
 
-    if (!closeChannels.isEmpty()) {
-        if (!sendCmd("ROUT:CLOS", closeChannels))
+    if (!closeCH_.isEmpty()) {
+        if (!sendCmd("ROUT:CLOS", closeCH_))
             return false;
     }
 
-    routeChannelsClosed = closedChannels;
+    routeChannelsClosed = closedCH;
 
     return true;
 }
@@ -268,15 +274,15 @@ bool QSCPIDev::setScan(Channel_t channel)
     return sendCmd(cmd.arg(channel), 2000000);
 }
 
-bool QSCPIDev::setScan(Channels_t channels)
+bool QSCPIDev::setScan(const Channels_t &channels)
 {
     QString cmd("ROUT:SCAN");
 
-    cmd = formatCmd(cmd, channels).append(";:INIT");
+    cmd = formatCmd(cmd, QStringList(), channels).append(";:INIT");
     return sendCmd(cmd, 2000000);
 }
 
-bool QSCPIDev::setSense(Sense_t sense, Channels_t channels)
+bool QSCPIDev::setSense(Sense_t sense, const Channels_t &channels, const QStringList &params)
 {
-    return sendCmd(sense, channels);
+    return sendCmd(sense, params, channels);
 }
