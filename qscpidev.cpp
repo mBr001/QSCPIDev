@@ -248,13 +248,13 @@ bool QSCPIDev::setRoute(Channels_t closeChannels, Channel_t min, Channel_t max)
     QString cmd;
 
     if (!openChannels.isEmpty()) {
-        cmd.append(formatCmd(":ROUT:OPEN", openChannels));
+        cmd.append(formatCmd(":ROUT:OPEN", QStringList(), openChannels));
     }
 
     if (!closeChannels.isEmpty()) {
         if (!cmd.isEmpty())
             cmd.append(";");
-        cmd.append(formatCmd(":ROUT:CLOS", closeChannels));
+        cmd.append(formatCmd(":ROUT:CLOS", QStringList(), closeChannels));
     }
 
     if (!sendCmd(cmd, Channels_t()))
