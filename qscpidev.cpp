@@ -98,7 +98,6 @@ bool QSCPIDev::open(const QString &port, BaudeRate_t baudeRate)
         return false;
     if (!sendCmd("SYST:REM"))
         return false;
-    routeChannelsClosed.clear();
 
     return true;
 }
@@ -237,32 +236,29 @@ bool QSCPIDev::setOutput(bool enabled)
         return sendCmd("OUTP 0");
 }
 
-bool QSCPIDev::setRoute(const Channels_t &closeChannels)
+bool QSCPIDev::setRoute(Channels_t closeChannels, Channel_t min, Channel_t max)
 {
-    Channels_t openCH(routeChannelsClosed);
-    Channels_t closedCH(closeChannels);
-    Channels_t closeCH_(closeChannels);
+    Channels_t openChannels;
 
-    foreach (Channel_t ch, closeChannels) {
-        openCH.removeOne(ch);
+    for (Channel_t ch(min); ch <= max; ++ch) {
+        if (closeChannels.indexOf(ch) == -1)
+            openChannels.append(ch);
     }
 
-    foreach (Channel_t ch, routeChannelsClosed) {
-        closeCH_.removeOne(ch);
+    QString cmd;
+
+    if (!openChannels.isEmpty()) {
+        cmd.append(formatCmd(":ROUT:OPEN", openChannels));
     }
 
-    if(!openCH.isEmpty()) {
-        if (!sendCmd("ROUT:OPEN", openCH))
-            return false;
-    }
-    routeChannelsClosed.clear();
-
-    if (!closeCH_.isEmpty()) {
-        if (!sendCmd("ROUT:CLOS", closeCH_))
-            return false;
+    if (!closeChannels.isEmpty()) {
+        if (!cmd.isEmpty())
+            cmd.append(";");
+        cmd.append(formatCmd(":ROUT:CLOS", closeChannels));
     }
 
-    routeChannelsClosed = closedCH;
+    if (!sendCmd(cmd, Channels_t()))
+        return false;
 
     return true;
 }

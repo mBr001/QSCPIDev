@@ -17,8 +17,6 @@ public:
         ERR_RESULT = 2
     } error_t;
 
-    Channels_t routeChannelsClosed;
-
     static Sense_t SenseVolt;
     static Sense_t SenseRes;
     static Sense_t SenseTemp;
@@ -35,7 +33,7 @@ public:
     bool read(QStringList *values, long timeout_usec = 0);
     bool setCurrent(double current);
     bool setOutput(bool enabled);
-    bool setRoute(const Channels_t &closeChannels);
+    bool setRoute(Channels_t closeChannels, Channel_t min, Channel_t max);
     bool setScan(Channel_t channel);
     bool setScan(const Channels_t &channels);
     bool setSense(Sense_t sense, const Channels_t &channels,
