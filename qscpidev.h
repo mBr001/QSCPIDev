@@ -28,7 +28,7 @@ public:
     int error() const;
     QString errorString() const;
     bool init();
-    bool open(const QString &port, BaudeRate_t baudeRate = QSerial::Baude9600);
+    bool open(const QString &port, BaudeRate_t baudeRate = QSerial::BAUDE9600);
     bool output(bool *enabled);
     bool read(QStringList *values, long timeout_usec = 0);
     bool setCurrent(double current);

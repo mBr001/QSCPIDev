@@ -2,15 +2,15 @@
 #define QSERIAL_H
 
 #include <QtCore>
-
+#include <termios.h>
 
 class QSerial
 {
 public:
-    typedef int BaudeRate_t;
-
-    static const BaudeRate_t Baude9600;
-    static const BaudeRate_t Baude19200;
+    typedef enum {
+        BAUDE9600 = B9600,
+        BAUDE19200 = B19200
+    } BaudeRate_t;
 
     QSerial();
     ~QSerial();

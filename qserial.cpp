@@ -2,15 +2,11 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <termios.h>
 #include <sys/select.h>
 #include <unistd.h>
 #include <QtCore>
 
 #include "qserial.h"
-
-const QSerial::BaudeRate_t QSerial::Baude9600 = B9600;
-const QSerial::BaudeRate_t QSerial::Baude19200 = B19200;
 
 QSerial::QSerial() :
     errorno(0), errorstr(""), fd(-1)
