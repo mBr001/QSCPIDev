@@ -138,13 +138,6 @@ bool QSerial::readLine(QString *str, ssize_t maxSize, long timeout = 0)
     return true;
 }
 
-/**
- * Reads data from serial port.
- * @param buf   Buffer to store readed data.
- * @param count Maximal amount of bytes to read.
- * @return      Number of bytes succesfully readed, or gefative number
- *      (error no.) on error.
- */
 ssize_t QSerial::readLine(char *buf, ssize_t count, long timeout_usec)
 {
     const char *buf_ = buf;
