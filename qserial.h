@@ -9,7 +9,8 @@ class QSerial
 public:
     typedef enum {
         BAUDE9600 = B9600,
-        BAUDE19200 = B19200
+        BAUDE19200 = B19200,
+        BAUDE115200 = B115200
     } BaudeRate_t;
 
     QSerial();
