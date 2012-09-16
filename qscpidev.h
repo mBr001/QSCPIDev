@@ -17,6 +17,19 @@ public:
         ERR_RESULT = 2
     } error_t;
 
+    /** SCPI version informations. */
+    struct Version {
+        int year;
+        int approved;
+
+        Version() :
+            year(-1), approved(-1)
+        { }
+
+        bool isValid() const
+        { return year > 0 && approved >= 0; }
+    };
+
     static Sense_t SenseVolt;
     static Sense_t SenseRes;
     static Sense_t SenseTemp;
@@ -28,7 +41,8 @@ public:
     int error() const;
     QString errorString() const;
     bool init();
-    bool open(const QString &port, BaudeRate_t baudeRate = QSerial::BAUDE9600);
+    bool open(const QString &port, BaudeRate_t baudeRate = QSerial::BAUDE9600,
+              bool setRemote = true);
     bool output(bool *enabled);
     bool read(QStringList *values, long timeout_usec = 0);
     bool setCurrent(double current);
@@ -38,6 +52,8 @@ public:
     bool setScan(const Channels_t &channels);
     bool setSense(Sense_t sense, const Channels_t &channels,
                   const QStringList &params = QStringList());
+    bool systemRemote();
+    Version systemVersion();
 
 protected:
     QString formatCmd(const QString &cmd, const QStringList &params, const Channels_t &channels);

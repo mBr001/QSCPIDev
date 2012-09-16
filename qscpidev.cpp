@@ -78,7 +78,7 @@ bool QSCPIDev::init()
     return sendCmd("INIT", 2000000);
 }
 
-bool QSCPIDev::open(const QString &port, BaudeRate_t baudeRate)
+bool QSCPIDev::open(const QString &port, BaudeRate_t baudeRate, bool setRemote)
 {
     const long timeout_usec = (10l * 1000000l) / 9600l;
 
@@ -96,8 +96,8 @@ bool QSCPIDev::open(const QString &port, BaudeRate_t baudeRate)
     }
     if (!sendCmd("*RST;*CLS", 500000))
         return false;
-    if (!sendCmd("SYST:REM"))
-        return false;
+    if (setRemote)
+        return systemRemote();
 
     return true;
 }
@@ -281,4 +281,35 @@ bool QSCPIDev::setScan(const Channels_t &channels)
 bool QSCPIDev::setSense(Sense_t sense, const Channels_t &channels, const QStringList &params)
 {
     return sendCmd(sense, params, channels);
+}
+
+bool QSCPIDev::systemRemote()
+{
+    return sendCmd("SYST:REM");
+}
+
+QSCPIDev::Version QSCPIDev::systemVersion()
+{
+    const QString cmd("SYST:VERS?");
+    QString resp;
+    Version version;
+
+    if (sendQuery(&resp, cmd, 2000000)) {
+        QStringList splitResp = resp.split('.');
+        if (splitResp.size() == 2) {
+            bool ok;
+            int year, approved;
+
+            year = QVariant(splitResp[0]).toInt(&ok);
+            if (ok) {
+                approved = QVariant(splitResp[1]).toInt(&ok);
+                if (ok) {
+                    version.year = year;
+                    version.approved = approved;
+                }
+            }
+        }
+    }
+
+    return version;
 }
