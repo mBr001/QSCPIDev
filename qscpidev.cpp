@@ -73,6 +73,11 @@ QString QSCPIDev::formatCmd(const QString &cmd, const QStringList &params, const
     return format.arg(cmd).arg(params_.join(","));
 }
 
+bool QSCPIDev::idn(QString *resp)
+{
+    return sendQuery(resp, "*IDN?");
+}
+
 bool QSCPIDev::init()
 {
     return sendCmd("INIT", 2000000);

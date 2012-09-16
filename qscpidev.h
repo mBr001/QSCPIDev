@@ -38,6 +38,7 @@ public:
     ~QSCPIDev();
     void close();
     bool current(double *i);
+    bool idn(QString *resp);
     int error() const;
     QString errorString() const;
     bool init();
