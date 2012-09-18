@@ -154,14 +154,6 @@ bool QSCPIDev::recvResponse(QString *resp, long timeout_usec)
         return false;
     }
     *resp = resp->trimmed();
-    if (*resp == "1") {
-        resp->clear();
-        return true;
-    }
-    if (resp->endsWith(";1")) {
-        resp->resize(resp->size() - 2);
-        return true;
-    }
 
     errorno = ERR_RESULT;
     errorstr = "ScpiDev::recvResponse invalid result";
@@ -175,9 +167,9 @@ bool QSCPIDev::sendCmd(const QString &cmd, long timeout_usec)
     if (!sendQuery(&resp, cmd, timeout_usec))
         return false;
 
-    if (!resp.isEmpty()) {
+    if (resp != "1") {
         errorno = ERR_RESULT;
-        errorstr = "ScpiDev::sendCmd nonempty response for nonquery";
+        errorstr = "ScpiDev::sendCmd operation not completed in time.";
 
         return false;
     }
@@ -194,14 +186,14 @@ bool QSCPIDev::sendCmd(const QString &cmd, const QStringList &params,
                        const Channels_t &channels, long timeout_usec)
 {
     QString resp;
-    QString _cmd(formatCmd(cmd, params, channels));
+    QString _cmd(formatCmd(cmd, params, channels) + ";*OPC?");
 
     if (!sendQuery(&resp, _cmd, timeout_usec))
         return false;
 
-    if (!resp.isEmpty()) {
+    if (resp != "1") {
         errorno = ERR_RESULT;
-        errorstr = "ScpiDev::sendCmd nonempty response";
+        errorstr = "ScpiDev::sendCmd command not completed in time";
 
         return false;
     }
@@ -214,7 +206,7 @@ bool QSCPIDev::sendQuery(QString *resp, const QString &cmd, long timeout_usec)
     errorno = 0;
     errorstr = "";
 
-    QString _cmd(cmd + ";*OPC?\n");
+    QString _cmd = cmd + "\n";
     if (!write(_cmd)) {
         errorno = ERR_QSERIAL;
         return false;
