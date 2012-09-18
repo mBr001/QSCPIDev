@@ -154,6 +154,9 @@ bool QSCPIDev::recvResponse(QString *resp, long timeout_usec)
         return false;
     }
     *resp = resp->trimmed();
+    if (!resp->isEmpty()) {
+        return true;
+    }
 
     errorno = ERR_RESULT;
     errorstr = "ScpiDev::recvResponse invalid result";
@@ -164,7 +167,8 @@ bool QSCPIDev::sendCmd(const QString &cmd, long timeout_usec)
 {
     QString resp;
 
-    if (!sendQuery(&resp, cmd, timeout_usec))
+    QString _cmd(cmd + ";*OPC?");
+    if (!sendQuery(&resp, _cmd, timeout_usec))
         return false;
 
     if (resp != "1") {
